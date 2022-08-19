@@ -10,11 +10,21 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const userDetails = useSelector((state) => state.userDetail.value);
+  const [order,setOrder] = useState(true);
+  useEffect(()=>{
+    if (order === true){
+      const sorted = [...todos].sort((a,b) => a.id - b.id);
+      setTodos(sorted);
+    } 
+    else if (order === false){
+      const sorted = [...todos].sort((a,b) => b.id - a.id);
+      setTodos(sorted);
+    }
+},[order])
   const showUserDetail = (userId, todoId, title) => {
     axios
       .get(`/users/${userId}`)
       .then((res) => {
-        console.log(res.data);
         dispatch(
           storeData({
             userId: userId,
@@ -62,16 +72,18 @@ function App() {
   return (
     <div className="flex ml-10 w-max">
       <div className="flex flex-col">
-        <div className="flex mt-10">
+        <div className="flex mt-10 mb-2">
           <h1 className="font-bold text-2xl">Todos</h1>
+          <button className="ml-2 p-1 border-2 bg-slate-100 active:bg-slate-200 hover:bg-slate-50" onClick={()=>{setOrder(!order)}}>
+            Sort ToDo ID
+            </button>
           <div className="ml-auto flex border-2 mb-2 border-black rounded-full mr-2">
             <img src="./SEARCH.svg" alt="" />
             <input
-              className="rounded-full mr-2"
+              className="rounded-full mr-2 focus:outline-none"
               type="text"
               placeholder="Search..."
               onChange={(e) => {
-                console.log(searchTerm);
                 setSearchTerm(e.target.value);
               }}
             />
@@ -81,7 +93,7 @@ function App() {
           <table className="w-[100%]">
             <thead>
               <tr className="border-2 border-[black]">
-                <th>ToDo Id</th>
+                <th>ToDo ID</th>
                 <th className="sm:w-[20rem] xl:w-[30rem]">Title</th>
                 <th>Title Status</th>
                 <th>Action</th>
@@ -136,7 +148,7 @@ function App() {
       <div className="ml-24 mt-40">
         <h1 className="font-bold text-2xl">User Details</h1>
         <div className="border-2 border-[black] pr-20 p-4 w-max">
-          ToDoId: {userDetails.todoId} <br />
+          ToDo ID: {userDetails.todoId} <br />
           Todo Tile: {userDetails.todoTitle} <br />
           User Id: {userDetails.userId} <br />
           Name: {userDetails.name} <br />
