@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "./Components/axios";
@@ -10,17 +11,16 @@ function App() {
   const [todos, setTodos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const userDetails = useSelector((state) => state.userDetail.value);
-  const [order,setOrder] = useState(true);
-  useEffect(()=>{
-    if (order === true){
-      const sorted = [...todos].sort((a,b) => a.id - b.id);
+  const [order, setOrder] = useState(true);
+  useEffect(() => {
+    if (order === true) {
+      const sorted = [...todos].sort((a, b) => a.id - b.id);
       setTodos(sorted);
-    } 
-    else if (order === false){
-      const sorted = [...todos].sort((a,b) => b.id - a.id);
+    } else if (order === false) {
+      const sorted = [...todos].sort((a, b) => b.id - a.id);
       setTodos(sorted);
     }
-},[order])
+  }, [order]);
   const showUserDetail = (userId, todoId, title) => {
     axios
       .get(`/users/${userId}`)
@@ -42,21 +42,15 @@ function App() {
       .get("/todos")
       .then((res) => {
         const response = res.data.map((data) => {
-          if (data.status === true) {
+          console.log(res.data);
+          if (data.completed === true) {
             return {
               userId: data.userId,
               id: data.id,
               title: data.title,
               status: "Complete",
             };
-          } else if (data.status === false) {
-            return {
-              userId: data.userId,
-              id: data.id,
-              title: data.title,
-              status: "Incomplete",
-            };
-          } else {
+          } else if (data.completed === false) {
             return {
               userId: data.userId,
               id: data.id,
@@ -74,9 +68,14 @@ function App() {
       <div className="flex flex-col">
         <div className="flex mt-10 mb-2">
           <h1 className="font-bold text-2xl">Todos</h1>
-          <button className="ml-2 p-1 border-2 bg-slate-100 active:bg-slate-200 hover:bg-slate-50" onClick={()=>{setOrder(!order)}}>
+          <button
+            className="ml-2 p-1 border-2 bg-slate-100 active:bg-slate-200 hover:bg-slate-50"
+            onClick={() => {
+              setOrder(!order);
+            }}
+          >
             Sort ToDo ID
-            </button>
+          </button>
           <div className="ml-auto flex border-2 mb-2 border-black rounded-full mr-2">
             <img src="./SEARCH.svg" alt="" />
             <input
@@ -126,6 +125,7 @@ function App() {
                       <td>{data.status}</td>
                       <td>
                         <button
+                          className="py-1 px-4 border-2 rounded-full border-black"
                           onClick={() => {
                             showUserDetail(
                               `${data.userId}`,
